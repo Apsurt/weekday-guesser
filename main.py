@@ -2,7 +2,7 @@ import datetime
 from NeuralNetwork import NN
 import numpy as np
 from GeneticAlgorithm import Population
-
+from time import time, sleep
 
 def generate_random_date(low_year=1, high_year=2101):
     year = np.random.randint(low_year, high_year)
@@ -35,13 +35,7 @@ weekdays = [
 
 
 def main():
-    pop = Population([3, 7], 100, 15, score_data)
-    print('Length:', pop.length)
-    #print('Generations:', pop.generations)
-    #print('Genes:', pop.read_genes(pop.generations[0][0]))
-    #print('Genes:', pop.read_genes(pop.generations[0][1]))
-    print('Fitted:', pop.fitted)
-    print('Sorted:', pop.sort_scores(pop.fitted[-1]))
-    pop.run(10,1)
+  pop = Population([3, 10, 10, 7], 500, (-5,5), score_data, 50)
+  pop.run(500, 1)
 
 main()

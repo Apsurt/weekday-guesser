@@ -7,7 +7,7 @@ class Population:
     def __init__(self,
                  structure,
                  size,
-                 accuracy,
+                 param_range,
                  test_func,
                  test_iter=100,
                  elite_percentage=0.25,
@@ -19,8 +19,8 @@ class Population:
         self.length = 0
         for layer in range(1, len(structure)):
             self.length += (structure[layer - 1] * structure[layer] +
-                            structure[layer]) * accuracy
-        self.accuracy = accuracy
+                            structure[layer])
+        self.range = param_range
         self.test_func = test_func
         self.test_iter = test_iter
         self.elite_percentage = elite_percentage
@@ -33,41 +33,20 @@ class Population:
         self.fitted = [self.fitness_generation()]
 
     def random_generation(self):
-        return [[np.random.randint(0, 2) for _ in range(self.length)]
+        return [[np.random.uniform(*self.range) for _ in range(self.length)]
                 for _ in range(self.size)]
-
-    def read_genes(self, specimen):
-        genes = [
-            specimen[x:self.accuracy + x]
-            for x in range(0, len(specimen), self.accuracy)
-        ]
-        for indx, gene in enumerate(genes):
-            dec = 0
-            for idx, bit in enumerate(range(len(gene) - 1, -1, -1)):
-                dec += gene[idx] * pow(2, bit)
-            genes[indx] = dec
-        highest = max(genes)
-        power = 0
-        while highest > 1:
-            highest = highest / 10
-            power += 1
-        genes = [gene / pow(10, power) for gene in genes]
-        return genes
 
     def fitness_generation(self):
         inp_list, expected_list = self.test_func(self.test_iter)
         if len(inp_list) != len(expected_list):
-            raise IndexError(
-                'Input list and expected list have to have same lenght')
+            raise IndexError('Input list and expected list have to have same lenght')
         if len(inp_list) != self.test_iter:
-            raise IndexError(
-                'Length of data to check has to be equal with number of iterations'
-            )
+            raise IndexError('Length of data to check has to be equal with number of iterations')
         fitted = []
         nn = NN(self.structure)
         for idx, specimen in enumerate(self.generations[-1]):
-          print(idx+1,'|',len(self.generations[-1]))
-          nn.set_wb(self.read_genes(specimen))
+          #print('Fitness specimen num:', idx+1,'|',len(self.generations[-1]))
+          nn.set_wb(specimen)
           correct = 0
           for i in range(0, self.test_iter):
             nn_out = nn.calculate(inp_list[i])
@@ -76,8 +55,8 @@ class Population:
           fitted.append(correct / self.test_iter)
         return fitted
 
-    def generation_avg_score(self, n):
-        return sum(self.fitted[n])/len(self.fitted[n])
+    def generation_avg_score(self, n, point = 5):
+        return round(sum(self.fitted[n])/len(self.fitted[n]), point)
     
     def sort_scores(self, fit_scores):
         temp_sorted = fit_scores.copy()

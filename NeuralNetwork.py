@@ -1,6 +1,5 @@
 import numpy as np
 
-
 class NN:
     def __init__(self, structure):
         #structure
@@ -28,7 +27,7 @@ class NN:
         #print('Biases:', self.biases)
 
         #Activation Function
-        self.activation_function = self.sigmoid(4)
+        self.activation_function = self.linear()
 
     def set_wb(self, genotype):
         idx = 0
@@ -46,9 +45,15 @@ class NN:
 
     def sigmoid(self, point=9):
         def f(x):
-            return round(1 / (1 + np.exp(-x)), point)
-
+          if abs(x) >= 700:
+            return 0
+          return round(1 / (1 + np.exp(-x)), point)
         return f
+
+    def linear(self, point=9):
+      def f(x):
+        return round(x, point)
+      return f
 
     def calculate(self, inp):
         if len(self.values[0]) == len(inp):
@@ -70,6 +75,4 @@ class NN:
 
 
 def main():
-    nn = NN([2, 2, 2])
-    nn.set_wb([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])
-    nn.calculate([1, 10], nn.sigmoid(4))
+    pass
